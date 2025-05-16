@@ -33,7 +33,7 @@ def output_courses(collection)
 end
 
 def save_to_json(collection, filename)
-  File.write(filename, JSON.pretty_generate(collection))
+    File.write(filename, JSON.pretty_generate(collection))
 end
 
 def load_from_json(filename)
@@ -41,7 +41,14 @@ def load_from_json(filename)
 end
 
 def save_to_yaml(collection, filename)
-  File.write(filename, collection.to_yaml)
+  data = {}
+  collection.each do |title, details|
+    data[title.to_s] = {
+      "teachers" => details[:teachers].map(&:to_s),
+      "topics" => details[:topics].map(&:to_s)
+    }
+  end
+  File.write(filename, data.to_yaml)
 end
 
 def load_from_yaml(filename)
@@ -49,10 +56,10 @@ def load_from_yaml(filename)
 end
 
 def main
-  courses = load_from_json("courses.json") rescue {}
+  courses = load_from_yaml("courses.yml") rescue {}
 
-  add_course(courses, "Mathematical Modeling", ["Yaroslav Bihun", "Oleh Ukrainets"], ["Population Growth", "Spread of infectious diseases"])
-  add_course(courses, "Python Fundamentals", ["Ihor Skutar"], ["Syntax", "Data Structures"])
+  # add_course(courses, "Mathematical Modeling", ["Yaroslav Bihun", "Oleh Ukrainets"], ["Population Growth", "Spread of infectious diseases"])
+  # add_course(courses, "Python Fundamentals", ["Ihor Skutar"], ["Syntax", "Data Structures"])
   
   edit_course(courses, "Mathematical Modeling", ["Yaroslav Bihun"], ["Population Growth", "Spread of infectious diseases"])
   

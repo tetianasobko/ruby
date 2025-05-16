@@ -63,7 +63,7 @@ class Manager
   def save_to_json(filename)
     data = {}
     @courses.each do |course|
-      data[course.title] = {
+      data[course.title.to_s] = {
         "teachers" => course.teachers.map(&:to_s),
         "topics" => course.topics.map(&:to_s)
       }
@@ -75,7 +75,7 @@ class Manager
   def save_to_yaml(filename)
     data = {}
     @courses.each do |course|
-      data[course.title] = {
+      data[course.title.to_s] = {
         "teachers" => course.teachers.map(&:to_s),
         "topics" => course.topics.map(&:to_s)
       }

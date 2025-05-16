@@ -1,0 +1,21 @@
+{
+  "Mathematical Modeling": {
+    "teachers": [
+      "Yaroslav Bihun"
+    ],
+    "topics": [
+      "Population Growth",
+      "Spread of infectious diseases"
+    ]
+  },
+  "Ruby on Rails": {
+    "teachers": [
+      "Nataliia Romanenko"
+    ],
+    "topics": [
+      "Data Types",
+      "Classes",
+      "Validation"
+    ]
+  }
+}

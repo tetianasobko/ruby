@@ -19,25 +19,49 @@ end
 
 def edit_course
   print 'Enter course name: '
-  name = gets.chomp.to_sym
-
-  return puts 'Course not found' unless $courses.key?(name)
+  name = gets.chomp
+  
+  key = $courses.keys.find { |k| k.to_s.downcase == name.downcase }
+  
+  return puts 'Course not found' unless key
 
   print 'Enter new name (or leave empty to not change): '
-  new_title = gets.chomp.to_sym
-  $courses[new_title] = $courses.delete(name) unless new_title.empty? || new_title == name
+  new_title = gets.chomp
+  
+  unless new_title.empty?
+    $courses[new_title] = $courses.delete(key)
+    key = new_title
+  end
 
-  updated_name = new_title.empty? ? name : new_title
-
+  details = $courses[key]
+  
   print 'Enter new teachers (comma-separated, or leave empty to not change): '
   new_teachers = gets.chomp
-  $courses[updated_name][:teachers] = new_teachers.split(',').map(&:strip) unless new_teachers.empty?
+  
+  unless new_teachers.empty?
+    teacher_array = new_teachers.split(',').map(&:strip)
+    # Update using the key format in the current details
+    if details.key?(:teachers)
+      details[:teachers] = teacher_array
+    else
+      details["teachers"] = teacher_array
+    end
+  end
 
   print 'Enter new topics (comma-separated, or leave empty to not change): '
   new_topics = gets.chomp
-  $courses[updated_name][:topics] = new_topics.split(',').map(&:strip) unless new_topics.empty?
   
-  puts "Course '#{updated_name}' updated successfully!"
+  unless new_topics.empty?
+    topic_array = new_topics.split(',').map(&:strip)
+    # Update using the key format in the current details
+    if details.key?(:topics)
+      details[:topics] = topic_array
+    else
+      details["topics"] = topic_array
+    end
+  end
+  
+  puts "Course '#{key}' updated successfully!"
 end
 
 def delete_course
@@ -55,9 +79,12 @@ def search_course
   query = gets.chomp.downcase
 
   results = $courses.select do |title, details|
+    teachers = details[:teachers] || details["teachers"] || []
+    topics = details[:topics] || details["topics"] || []
+    
     title.to_s.downcase.include?(query) ||
-      details[:teachers].any? { |teacher| teacher.to_s.downcase.include?(query) } ||
-      details[:topics].any? { |topic| topic.to_s.downcase.include?(query) }
+      teachers.any? { |teacher| teacher.to_s.downcase.include?(query) } ||
+      topics.any? { |topic| topic.to_s.downcase.include?(query) }
   end
 
   if results.empty?
@@ -66,8 +93,10 @@ def search_course
     puts "Found #{results.size} courses:"
     results.each do |title, details|
       puts "Course: #{title}"
-      puts "Teachers: #{details[:teachers].join(', ')}"
-      puts "Topics: #{details[:topics].join(', ')}"
+      teachers = details[:teachers] || details["teachers"] || []
+      topics = details[:topics] || details["topics"] || []
+      puts "Teachers: #{teachers.join(', ')}"
+      puts "Topics: #{topics.join(', ')}"
       puts "-----------------------"
     end
   end
@@ -86,14 +115,14 @@ def load_from_file
   case format
   when 1
     begin
-      $courses = JSON.parse(File.read("#{filename}.json"), symbolize_names: true)
+      $courses = JSON.parse(File.read("#{filename}.json"))
       puts "Data loaded from #{filename}.json successfully!"
     rescue
       puts "Error loading from JSON file. Check if the file exists and contains valid JSON."
     end
   when 2
     begin
-      $courses = YAML.load_file("#{filename}.yml", symbolize_names: true)
+      $courses = YAML.load_file("#{filename}.yml")
       puts "Data loaded from #{filename}.yml successfully!"
     rescue
       puts "Error loading from YAML file. Check if the file exists and contains valid YAML."
@@ -112,7 +141,17 @@ def save_to_file(format)
     File.write("#{filename}.json", JSON.pretty_generate($courses))
     puts "Data saved to #{filename}.json successfully!"
   when :yaml
-    File.write("#{filename}.yml", $courses.to_yaml)
+    data = {}
+    $courses.each do |title, details|
+      teachers = details["teachers"] || []
+      topics = details[:topics] || details["topics"] || []
+      
+      data[title.to_s] = {
+        "teachers" => teachers.map(&:to_s),
+        "topics" => topics.map(&:to_s)
+      }
+    end
+    File.write("#{filename}.yml", data.to_yaml)
     puts "Data saved to #{filename}.yml successfully!"
   end
 end
@@ -128,8 +167,11 @@ def show_courses
   
   $courses.each do |title, details|
     puts "\nCourse: #{title}"
-    puts "Teachers: #{details[:teachers].join(', ')}"
-    puts "Topics: #{details[:topics].join(', ')}"
+    # Handle both symbol and string keys
+    teachers = details[:teachers] || details["teachers"] || []
+    topics = details[:topics] || details["topics"] || []
+    puts "Teachers: #{teachers.join(', ')}"
+    puts "Topics: #{topics.join(', ')}"
     puts "-----------------------"
   end
 end
