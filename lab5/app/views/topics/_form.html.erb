@@ -1,8 +1,7 @@
 <%= form_with(model: topic) do |form| %>
   <% if topic.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(topic.errors.count, "error") %> prohibited this topic from being saved:</h2>
-
+    <div class="alert alert-danger">
+      <h4><%= pluralize(topic.errors.count, "error") %> prohibited this topic from being saved:</h4>
       <ul>
         <% topic.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -11,17 +10,22 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter topic name" %>
+    <div class="form-text">Name of the topic or subject matter</div>
   </div>
 
-  <div>
-    <%= form.label :course_id, style: "display: block" %>
-    <%= form.text_field :course_id %>
+  <div class="mb-3">
+    <%= form.label :course_id, "Associated Course", class: "form-label" %>
+    <%= form.collection_select :course_id, Course.all, :id, :title, 
+                              { selected: topic.course_id, include_blank: "None (Topic without course)" }, 
+                              { class: "form-select" } %>
+    <div class="form-text">The course this topic is associated with</div>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+    <%= link_to "Cancel", topics_path, class: "btn btn-outline-secondary me-md-2" %>
+    <%= form.submit class: "btn btn-primary" %>
   </div>
 <% end %>

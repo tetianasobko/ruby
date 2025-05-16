@@ -5,8 +5,15 @@
   </p>
 
   <p>
-    <strong>Course:</strong>
-    <%= teacher.course_id %>
+    <strong>Courses:</strong>
+    <% if teacher.courses.any? %>
+      <ul>
+        <% teacher.courses.each do |course| %>
+          <li><%= link_to course.title, course %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <em>No courses assigned</em>
+    <% end %>
   </p>
-
 </div>

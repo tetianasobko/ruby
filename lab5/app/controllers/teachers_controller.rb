@@ -13,7 +13,8 @@ class TeachersController < ApplicationController
   # GET /teachers/new
   def new
     @teacher = Teacher.new
-    @teacher.course_id = params[:teacher][:course_id] if params[:teacher] && params[:teacher][:course_id]
+    # Store course_id in instance variable for form if coming from a course
+    @course_id = params[:course_id] if params[:course_id]
   end
 
   # GET /teachers/1/edit
@@ -22,11 +23,23 @@ class TeachersController < ApplicationController
 
   # POST /teachers or /teachers.json
   def create
-    @teacher = Teacher.new(teacher_params)
+    @teacher = Teacher.new(teacher_params.except(:course_ids))
 
     if @teacher.save
+      # Handle course associations if present
+      if params[:teacher][:course_ids].present?
+        course_ids = Array(params[:teacher][:course_ids]).reject(&:blank?)
+        @teacher.course_ids = course_ids
+      end
+      
       flash[:notice] = "Teacher was successfully created."
-      redirect_to @teacher.course
+      
+      # Redirect to the first course if associated, otherwise to teachers list
+      if @teacher.courses.any?
+        redirect_to @teacher.courses.first
+      else
+        redirect_to teachers_path
+      end
     else
       render :new
     end
@@ -34,9 +47,21 @@ class TeachersController < ApplicationController
 
   # PATCH/PUT /teachers/1 or /teachers/1.json
   def update
-    if @teacher.update(teacher_params)
+    if @teacher.update(teacher_params.except(:course_ids))
+      # Handle course associations if present
+      if params[:teacher][:course_ids].present?
+        course_ids = Array(params[:teacher][:course_ids]).reject(&:blank?)
+        @teacher.course_ids = course_ids
+      end
+      
       flash[:notice] = "Teacher was successfully updated."
-      redirect_to @teacher.course
+      
+      # Redirect to the first course if associated, otherwise to teachers list
+      if @teacher.courses.any?
+        redirect_to @teacher.courses.first
+      else
+        redirect_to @teacher
+      end
     else
       render :edit
     end
@@ -44,20 +69,19 @@ class TeachersController < ApplicationController
 
   # DELETE /teachers/1 or /teachers/1.json
   def destroy
-    course = @teacher.course
     @teacher.destroy
     flash[:notice] = "Teacher was successfully deleted."
-    redirect_to course
+    redirect_to teachers_path
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_teacher
-      @teacher = Teacher.find(params.expect(:id))
+      @teacher = Teacher.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def teacher_params
-      params.require(:teacher).permit(:name, :course_id)
+      params.require(:teacher).permit(:name, course_ids: [])
     end
 end

@@ -21,48 +21,12 @@
             <% @course.teachers.each do |teacher| %>
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <%= teacher.name %>
-                <div class="btn-group">
-                  <%= link_to teacher, class: "btn btn-sm btn-outline-primary" do %>
-                    <i class="bi bi-eye"></i>
-                  <% end %>
-                  <%= link_to edit_teacher_path(teacher), class: "btn btn-sm btn-outline-secondary" do %>
-                    <i class="bi bi-pencil"></i>
-                  <% end %>
-                  <%= button_to teacher, method: :delete, class: "btn btn-sm btn-outline-danger" do %>
-                    <i class="bi bi-trash"></i>
-                  <% end %>
-                </div>
               </li>
             <% end %>
           </ul>
         <% else %>
           <p class="text-muted">No teachers assigned to this course yet.</p>
         <% end %>
-        
-        <div class="row mt-3 mb-3">
-          <div class="col">
-            <%= link_to new_teacher_path(teacher: { course_id: @course.id }), class: "btn btn-outline-primary btn-sm" do %>
-              <i class="bi bi-plus-circle"></i> Add New Teacher
-            <% end %>
-          </div>
-        </div>
-        
-        <!-- Add existing teacher dropdown -->
-        <div class="card mb-3">
-          <div class="card-header">Add Existing Teacher</div>
-          <div class="card-body">
-            <%= form_with(url: add_teacher_course_path(@course), method: :patch) do |form| %>
-              <div class="mb-3">
-                <%= form.collection_select :teacher_id, 
-                                          Teacher.where(course_id: nil).or(Teacher.where.not(id: @course.teacher_ids)), 
-                                          :id, :name, 
-                                          { prompt: "Select teacher..." },
-                                          { class: "form-select" } %>
-              </div>
-              <%= form.submit "Add Teacher", class: "btn btn-primary btn-sm" %>
-            <% end %>
-          </div>
-        </div>
       </div>
       
       <div class="col-md-6">
@@ -88,10 +52,6 @@
           </ul>
         <% else %>
           <p class="text-muted">No topics assigned to this course yet.</p>
-        <% end %>
-        
-        <%= link_to new_topic_path(topic: { course_id: @course.id }), class: "btn btn-outline-primary btn-sm" do %>
-          <i class="bi bi-plus-circle"></i> Add Topic
         <% end %>
       </div>
     </div>

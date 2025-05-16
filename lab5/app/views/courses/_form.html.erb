@@ -10,21 +10,34 @@
     </div>
   <% end %>
 
-  <div class="mb-3">
-    <%= form.label :title, class: "form-label" %>
-    <%= form.text_field :title, class: "form-control", placeholder: "Enter course title" %>
-  </div>
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Course Details</h5>
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <%= form.label :title, class: "form-label fw-bold" %>
+        <%= form.text_field :title, class: "form-control form-control-lg", placeholder: "Enter course title" %>
+        <div class="form-text">The name of the course (e.g., "Web Development with Rails")</div>
+      </div>
 
-  <div class="mb-3">
-    <%= form.label :teacher_ids, "Select Teachers", class: "form-label" %>
-    <%= form.collection_select :teacher_ids, Teacher.all, :id, :name, 
-                              { selected: course.teacher_ids }, 
-                              { multiple: true, class: "form-select" } %>
-    <div class="form-text">Hold Ctrl/Cmd to select multiple teachers</div>
+      <div class="mb-3">
+        <%= form.label :teacher_ids, "Select Teachers", class: "form-label fw-bold" %>
+        <div class="border rounded p-3 bg-light">
+          <%= form.collection_select :teacher_ids, Teacher.all, :id, :name, 
+                                    { selected: course.teacher_ids }, 
+                                    { multiple: true, class: "form-select", size: [Teacher.count, 5].min } %>
+          <div class="form-text mt-2">
+            <i class="bi bi-info-circle me-1"></i>
+            Hold Ctrl/Cmd to select multiple teachers
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
     <%= link_to "Cancel", courses_path, class: "btn btn-outline-secondary me-md-2" %>
-    <%= form.submit class: "btn btn-primary" %>
+    <%= form.submit class: "btn btn-primary px-4" %>
   </div>
 <% end %>
