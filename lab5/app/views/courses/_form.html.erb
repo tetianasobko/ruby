@@ -1,0 +1,30 @@
+<%= form_with(model: course) do |form| %>
+  <% if course.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(course.errors.count, "error") %> prohibited this course from being saved:</h4>
+      <ul>
+        <% course.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, class: "form-control", placeholder: "Enter course title" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :teacher_ids, "Select Teachers", class: "form-label" %>
+    <%= form.collection_select :teacher_ids, Teacher.all, :id, :name, 
+                              { selected: course.teacher_ids }, 
+                              { multiple: true, class: "form-select" } %>
+    <div class="form-text">Hold Ctrl/Cmd to select multiple teachers</div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+    <%= link_to "Cancel", courses_path, class: "btn btn-outline-secondary me-md-2" %>
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

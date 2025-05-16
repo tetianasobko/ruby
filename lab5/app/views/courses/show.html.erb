@@ -1,0 +1,105 @@
+<p style="color: green"><%= notice %></p>
+
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="mb-0"><%= @course.title %></h2>
+    <div>
+      <%= link_to edit_course_path(@course), class: "btn btn-sm btn-outline-secondary" do %>
+        <i class="bi bi-pencil"></i> Edit
+      <% end %>
+      <%= button_to @course, method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Are you sure you want to delete this course?" } } do %>
+        <i class="bi bi-trash"></i> Delete
+      <% end %>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h4>Teachers</h4>
+        <% if @course.teachers.any? %>
+          <ul class="list-group mb-3">
+            <% @course.teachers.each do |teacher| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <%= teacher.name %>
+                <div class="btn-group">
+                  <%= link_to teacher, class: "btn btn-sm btn-outline-primary" do %>
+                    <i class="bi bi-eye"></i>
+                  <% end %>
+                  <%= link_to edit_teacher_path(teacher), class: "btn btn-sm btn-outline-secondary" do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                  <%= button_to teacher, method: :delete, class: "btn btn-sm btn-outline-danger" do %>
+                    <i class="bi bi-trash"></i>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-muted">No teachers assigned to this course yet.</p>
+        <% end %>
+        
+        <div class="row mt-3 mb-3">
+          <div class="col">
+            <%= link_to new_teacher_path(teacher: { course_id: @course.id }), class: "btn btn-outline-primary btn-sm" do %>
+              <i class="bi bi-plus-circle"></i> Add New Teacher
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Add existing teacher dropdown -->
+        <div class="card mb-3">
+          <div class="card-header">Add Existing Teacher</div>
+          <div class="card-body">
+            <%= form_with(url: add_teacher_course_path(@course), method: :patch) do |form| %>
+              <div class="mb-3">
+                <%= form.collection_select :teacher_id, 
+                                          Teacher.where(course_id: nil).or(Teacher.where.not(id: @course.teacher_ids)), 
+                                          :id, :name, 
+                                          { prompt: "Select teacher..." },
+                                          { class: "form-select" } %>
+              </div>
+              <%= form.submit "Add Teacher", class: "btn btn-primary btn-sm" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <h4>Topics</h4>
+        <% if @course.topics.any? %>
+          <ul class="list-group mb-3">
+            <% @course.topics.each do |topic| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <%= topic.name %>
+                <div class="btn-group">
+                  <%= link_to topic, class: "btn btn-sm btn-outline-primary" do %>
+                    <i class="bi bi-eye"></i>
+                  <% end %>
+                  <%= link_to edit_topic_path(topic), class: "btn btn-sm btn-outline-secondary" do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                  <%= button_to topic, method: :delete, class: "btn btn-sm btn-outline-danger" do %>
+                    <i class="bi bi-trash"></i>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-muted">No topics assigned to this course yet.</p>
+        <% end %>
+        
+        <%= link_to new_topic_path(topic: { course_id: @course.id }), class: "btn btn-outline-primary btn-sm" do %>
+          <i class="bi bi-plus-circle"></i> Add Topic
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <%= link_to courses_path, class: "btn btn-outline-secondary" do %>
+    <i class="bi bi-arrow-left"></i> Back to courses
+  <% end %>
+</div>

@@ -1,0 +1,16 @@
+<% content_for :title, "New course" %>
+
+<div class="card">
+  <div class="card-header">
+    <h2>New Course</h2>
+  </div>
+  <div class="card-body">
+    <%= render "form", course: @course %>
+  </div>
+</div>
+
+<br>
+
+<div>
+  <%= link_to "Back to courses", courses_path %>
+</div>
